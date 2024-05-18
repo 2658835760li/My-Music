@@ -1,5 +1,6 @@
 package com.example.yin.controller;
 
+import com.example.yin.Util.MD5Utils;
 import com.example.yin.common.ErrorMessage;
 import com.example.yin.common.FatalMessage;
 import com.example.yin.common.SuccessMessage;
@@ -55,6 +56,7 @@ public class ConsumerController {
         String introduction = req.getParameter("introduction").trim();
         String location = req.getParameter("location").trim();
         String avator = "/img/avatorImages/user.jpg";
+        String pwd = MD5Utils.inputPassToFormPass(password);
 
         if(consumerService.existUser(username)) {
             return new WarningMessage("用户名已注册").getMessage();
@@ -69,7 +71,7 @@ public class ConsumerController {
             e.printStackTrace();
         }
         consumer.setUsername(username);
-        consumer.setPassword(password);
+        consumer.setPassword(pwd);
         consumer.setSex(new Byte(sex));
         if ("".equals(phone_num)) {
             consumer.setPhoneNum(null);
@@ -109,8 +111,9 @@ public class ConsumerController {
     public Object loginStatus(HttpServletRequest req, HttpSession session) {
         String username = req.getParameter("username");
         String password = req.getParameter("password");
+        String pwd = MD5Utils.inputPassToFormPass(password);
 
-        boolean res = consumerService.veritypasswd(username, password);
+        boolean res = consumerService.veritypasswd(username, pwd);
         if (res) {
             session.setAttribute("username", username);
             return new SuccessMessage<List<Consumer>>("登录成功", consumerService.loginStatus(username)).getMessage();
@@ -204,15 +207,17 @@ public class ConsumerController {
         String username = req.getParameter("username").trim();
         String old_password = req.getParameter("old_password").trim();
         String password = req.getParameter("password").trim();
+        String old_pwd = MD5Utils.inputPassToFormPass(old_password);
+        String pwd = MD5Utils.inputPassToFormPass(password);
 
-        boolean res = consumerService.veritypasswd(username, old_password);
+        boolean res = consumerService.veritypasswd(username, old_pwd);
         if (!res) {
             return new ErrorMessage("密码输入错误").getMessage();
         }
 
         Consumer consumer = new Consumer();
         consumer.setId(Integer.parseInt(id));
-        consumer.setPassword(password);
+        consumer.setPassword(pwd);
 
         boolean result = consumerService.updatePassword(consumer);
         if (result) {

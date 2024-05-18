@@ -21,13 +21,13 @@ import { defineComponent, getCurrentInstance, computed, reactive } from "vue";
 import { useStore } from "vuex";
 import mixin from "@/mixins/mixin";
 import { HttpManager } from "@/api";
-import { validatePassword } from "@/enums";
+import { RouterName, validatePassword } from "@/enums";
 
 export default defineComponent({
   setup() {
     const store = useStore();
     const { proxy } = getCurrentInstance();
-    const { goBack } = mixin();
+    const { routerManager } = mixin();
 
     const form = reactive({
       oldPassword: "",
@@ -76,7 +76,7 @@ export default defineComponent({
         message: result.message,
         type: result.type,
       });
-      if (result.success) goBack();
+      if (result.success) routerManager(RouterName.SignIn, { path: RouterName.SignIn });
     }
 
     return {
